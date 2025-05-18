@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tachograph-simulator # nombre del recurso en kubernetes (identidad del statefulset)
+spec:
+  serviceName: tachograph-service # nombre del servicio asociado al statefulset (tachograph-service.yml)
+  replicas: 5  # Número de tacógrafos a simular
+  selector:
+    matchLabels:
+      app: tachograph-simulator # le dice al statefulset qué pods controla --> Solo controla los Pods que tengan ese label exacto (app: tachograph-simulator).
+  template:
+    metadata:
+      labels:
+        app: tachograph-simulator # Etiqueta asociada a los pods. define los labels que tendrán los Pods creados por este StatefulSet. Los Pods heredan estos labels. Debe coincidir con el selector.matchLabels
+    spec:
+
+      volumes:
+        - name: tokens
+          secret:
+            secretName: tachograph-tokens
+
+      containers: # contenedores que formarán parte del pod. Los nombres de los contenedores solo pueden contener minúsculas, numeros y guiones
+        - name: control-unit           
+          image: seluc3m-siot-control-unit:c1 # us-central1-docker.pkg.dev/uc3m-inf-2025-18654-g12/siot-repo/seluc3m-siot-control-unit:c1
+          ports: 
+            - containerPort: 5000
+          envFrom: # se cargan todas las variables de entorno de los ConfigMaps y Secrets
+            - configMapRef:                 
+                name: tachograph-configuration-configmap
+            - configMapRef:                 
+                name: controlunit-configmap
+            - secretRef:
+                name: tachograph-keys
+            - secretRef:
+                name: tachograph-tokens
+          env: # variables de entorno especificas
+            - name: TENANT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tachograph-secrets
+                  key: TENANT_PASSWORD
+            - name: PRIVATE_KEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tachograph-secrets
+                  key: PRIVATE_KEY_PASSWORD
+            - name: CUSTOMER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: tachograph-secrets
+                  key: CUSTOMER_ID
+          volumeMounts:
+            - name: tokens
+              mountPath: /etc/secrets
+              readOnly: true
+        
+        - name: card-reader
+          image: seluc3m-siot-card-reader:c1 # us-central1-docker.pkg.dev/uc3m-inf-2025-18654-g12/siot-repo/seluc3m-siot-card-reader:c1
+          ports:
+            - containerPort: 5001
+          envFrom: # se cargan todas las variables de entorno de los ConfigMaps y Secrets
+            - configMapRef:                 
+                name: tachograph-configuration-configmap
+            - configMapRef:                 
+                name: cardreader-configmap
+
+        - name: positioning-system
+          image: seluc3m-siot-gnss:c1 # us-central1-docker.pkg.dev/uc3m-inf-2025-18654-g12/siot-repo/seluc3m-siot-gnss:c1
+          ports:
+            - containerPort: 5002
+          envFrom: # se cargan todas las variables de entorno de los ConfigMaps y Secrets
+            - configMapRef:                 
+                name: tachograph-configuration-configmap
+            - configMapRef:                 
+                name: gnss-configmap
+
+        - name: odometer-simulator
+          image: seluc3m-siot-odometer:c1 # us-central1-docker.pkg.dev/uc3m-inf-2025-18654-g12/siot-repo/seluc3m-siot-odometer:c1
+          ports:
+            - containerPort: 5003
+          envFrom: # se cargan todas las variables de entorno de los ConfigMaps y Secrets
+            - configMapRef:                 
+                name: tachograph-configuration-configmap
+            - configMapRef:                 
+                name: odometer-configmap
+        
+        - name: routes-generator
+          image: seluc3m-siot-routes-generator:c1 # us-central1-docker.pkg.dev/uc3m-inf-2025-18654-g12/siot-repo/seluc3m-siot-routes-generator:c1
+          ports:
+            - containerPort: 5004
+          envFrom: # se cargan todas las variables de entorno de los ConfigMaps y Secrets
+            - configMapRef:                 
+                name: tachograph-configuration-configmap
+            - configMapRef:                 
+                name: routesgenerator-configmap
+          env: # variables de entorno especificas
+            - name: GOOGLE_MAPS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tachograph-secrets
+                  key: GOOGLE_MAPS_API_KEY

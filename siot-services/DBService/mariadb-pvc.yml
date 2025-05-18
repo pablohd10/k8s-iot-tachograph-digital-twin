@@ -1,0 +1,11 @@
+apiVersion: v1                      # Versión de la API de Kubernetes que maneja recursos básicos como PVCs
+kind: PersistentVolumeClaim        # Tipo de recurso: una solicitud de volumen persistente
+metadata:
+  name: mariadb-pvc                # Nombre del PVC, se usará para referenciar este volumen desde un Pod (por ejemplo, para montarlo)
+spec:
+  storageClassName: silver         # Se vincula al StorageClass llamado 'silver', que define cómo debe crearse el volumen (disco HDD, ext4, etc.)
+  accessModes:
+    - ReadWriteOnce                # Modo de acceso: solo puede ser montado por un único nodo en modo lectura/escritura al mismo tiempo
+  resources:
+    requests:
+      storage: 10Gi                # Solicita 10 gigabytes de almacenamiento; es el tamaño del volumen que se creará dinámicamente

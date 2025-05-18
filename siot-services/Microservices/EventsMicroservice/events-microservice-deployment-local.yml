@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: events-microservice
+spec:
+  replicas: 1  # Solo un pod del microservicio
+  selector:
+    matchLabels:
+      app: events-microservice
+  template:
+    metadata:
+      labels:
+        app: events-microservice
+    spec:
+      containers:
+        - name: events-microservice
+          image: seluc3m-siot-events-microservice:c1
+          ports:
+            - containerPort: 6001
+          envFrom:
+            - configMapRef:
+                name: events-microservice-configmap
+            - configMapRef:
+                name: microservices-common-configmap
+          env:
+            - name: DBPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: microservices-common-secrets
+                  key: DBPASSWORD

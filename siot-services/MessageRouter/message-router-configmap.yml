@@ -1,0 +1,17 @@
+apiVersion: v1 
+kind: ConfigMap 
+metadata: 
+  name: message-router-configmap 
+data: 
+  PYTHONUNBUFFERED: "1"
+  
+  # Thingsboard
+  THINGSBOARD_HOST: '146.148.75.67'
+  THINGSBOARD_PORT: "8080"
+  TENANT_USERNAME: 'tenant@thingsboard.org' 
+
+  # Microservicios
+  EVENTS_MICROSERVICE_ADDRESS: 'events-microservice-service' 
+  EVENTS_MICROSERVICE_PORT: "6001"
+  TELEMETRY_MICROSERVICE_ADDRESS: 'telemetry-microservice-service' 
+  TELEMETRY_MICROSERVICE_PORT: "6002"

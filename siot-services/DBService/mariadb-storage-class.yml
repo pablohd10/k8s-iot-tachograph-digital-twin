@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1  # Versión de la API que gestiona recursos de almacenamiento
+kind: StorageClass             # Tipo de recurso que se está creando, en este caso una clase de almacenamiento
+metadata:
+  name: silver                 # Nombre de la StorageClass, utilizado para referenciarla en PVCs (PersistentVolumeClaims)
+provisioner: kubernetes.io/gce-pd   # Proveedor de volúmenes, en este caso discos persistentes de Google Cloud (GCE Persistent Disk)
+volumeBindingMode: Immediate        # Los volúmenes se vinculan al nodo de inmediato, al crear el PVC (no espera al scheduling del pod)
+allowVolumeExpansion: true          # Permite expandir el tamaño del volumen incluso después de haber sido creado y montado
+reclaimPolicy: Delete               # Al eliminar el PVC, el volumen asociado también será eliminado automáticamente
+parameters:
+  type: pd-standard           # Tipo de disco: 'pd-standard' es un disco estándar (basado en HDD), más barato pero más lento que un SSD
+  fstype: ext4                # Sistema de archivos que se usará para formatear el volumen (aquí EXT4)
+  replication-type: none      # No se configura replicación adicional (relevante para regiones/zonas en GCP)

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment # what to create?
+metadata:
+  name: mariadb # nombre del deployment
+spec:
+  replicas: 1  # how many replicas of pods we want to create
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb # service will look for this label.
+    spec:
+      containers:
+      - name: mariadb
+        image: seluc3m-siot-mariadb:c1
+        ports:
+          - containerPort: 3306
+        env:
+          - name: MARIADB_ROOT_PASSWORD # variable de entorno --> secret
+            valueFrom:
+              secretKeyRef:
+                name: mariadb-secrets
+                key: root-password # Clave
+        volumeMounts: # volumen persistente
+          - name: mariadb-persistent-storage
+            mountPath: /var/lib/mysql
+      volumes:
+        - name: mariadb-persistent-storage
+          persistentVolumeClaim:
+            claimName: mariadb-pvc

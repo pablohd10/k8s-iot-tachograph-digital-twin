@@ -1,0 +1,12 @@
+apiVersion: v1              # Versión de la API de Kubernetes que se está utilizando (v1 para Service)
+kind: Service               # Tipo de recurso: en este caso, un Service
+metadata:
+  name: mariadb-service     # Nombre del Service; será usado para referenciarlo dentro del clúster
+spec:
+  type: ClusterIP           # Tipo de servicio: ClusterIP (accesible solo dentro del clúster)
+  selector:
+    app: mariadb            # Selector de etiquetas: conecta este Service con los Pods que tengan la etiqueta 'app: mariadb'
+  ports:
+  - protocol: TCP           # Protocolo usado para la comunicación (MariaDB usa TCP)
+    port: 3306              # Puerto expuesto por el Service dentro del clúster
+    targetPort: 3306        # Puerto al que se dirige el tráfico en el contenedor (el puerto en el que MariaDB está escuchando)

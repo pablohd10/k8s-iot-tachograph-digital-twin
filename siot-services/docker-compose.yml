@@ -1,0 +1,18 @@
+services:
+    
+  message_router:
+    build: ./MessageRouter
+    container_name: message_router
+    ports:
+      - "6000:6000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=6000
+      - THINGSBOARD_HOST=34.136.84.125
+      - THINGSBOARD_PORT=8080
+      - PRIVATE_KEY_PASSWORD=${PRIVATE_KEY_PASSWORD}
+      - TENANT_USERNAME=tenant@thingsboard.org
+      - TENANT_PASSWORD=${TENANT_PASSWORD}
+      - CUSTOMER_ID=7a474500-19ed-11f0-9a78-21a91fd069b7
+    volumes:
+      - ./MessageRouter/code:/etc/usr/src/code

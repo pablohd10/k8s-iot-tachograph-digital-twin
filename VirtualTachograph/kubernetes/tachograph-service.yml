@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tachograph-service #  nombre único del servicio dentro del clúster de Kubernetes. (DNS interno y accesible utilizando el nombre)
+  labels:
+    app: tachograph-simulator # etiqueta informativa asociada al servicio mismo
+spec:
+  clusterIP: None  # Headless --> no single IP for the whole service. Register IP of individual pods in the DNS. 1 IP for each POD!!
+  selector:
+    app: tachograph-simulator # Le dice al servicio a qué pods debe dirigir el tráfico -->  a todos los Pods que tengan la etiqueta app: tachograph-simulator.

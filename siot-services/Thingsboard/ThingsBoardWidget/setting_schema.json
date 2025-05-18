@@ -1,0 +1,26 @@
+{     
+    "schema": 
+    {         
+        "type": "object",         
+        "title": "Settings",         
+        "properties": 
+        {             
+            "oneWayElseTwoWay": {                 
+                "title": "Is One Way Command",                 
+                "type": "boolean",                 
+                "default": true             
+            },
+            "requestTimeout": {                 
+                "title": "RPC request timeout",
+                "type": "number",                 
+                "default": 5000              
+            }         
+        },
+                "required": []     
+    },
+    "form": 
+    [         
+        "oneWayElseTwoWay",         
+        "requestTimeout"     
+    ] 
+}  

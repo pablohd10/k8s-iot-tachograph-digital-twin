@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: events-microservice-configmap
+data:
+  PYTHONUNBUFFERED: "1"
+
+  HOST: "0.0.0.0"
+  PORT: "6001"

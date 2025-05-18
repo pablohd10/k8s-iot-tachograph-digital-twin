@@ -1,0 +1,7 @@
+tb-mqtt-client
+pymmh3
+pycryptodome
+six==1.16.0
+tb-rest-client==3.7.0
+cryptography
+requests

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemetry-microservice
+spec:
+  replicas: 1  # Solo un pod del microservicio
+  selector:
+    matchLabels:
+      app: telemetry-microservice
+  template:
+    metadata:
+      labels:
+        app: telemetry-microservice
+    spec:
+      containers:
+        - name: telemetry-microservice
+          image: seluc3m-siot-telemetry-microservice:c1
+          ports:
+            - containerPort: 6002
+          envFrom:
+            - configMapRef:
+                name: telemetry-microservice-configmap
+            - configMapRef:
+                name: microservices-common-configmap
+          env:
+            - name: DBPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: microservices-common-secrets
+                  key: DBPASSWORD

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment # what to create?
+metadata:
+  name: mariadb # nombre del deployment
+spec:
+  replicas: 1  # how many replicas of pods we want to create
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb # service will look for this label.
+    spec:
+      containers:
+      - name: mariadb
+        image: us-central1-docker.pkg.dev/uc3m-inf-2025-18654-g12/siot-repo/seluc3m-siot-mariadb:c1
+        ports:
+          - containerPort: 3306
+        env:
+          - name: MARIADB_ROOT_PASSWORD # variable de entorno --> secret
+            valueFrom:
+              secretKeyRef:
+                name: mariadb-secrets
+                key: root-password # Clave
+        volumeMounts: # volumen persistente
+          - name: mariadb-persistent-storage
+            mountPath: /var/lib/mysql
+        resources:
+          requests:
+            cpu: "200m"       # CPU mínima garantizada
+            memory: "512Mi"   # Memoria mínima garantizada
+          limits:
+            cpu: "400m"       # CPU máxima permitida
+            memory: "1Gi"     # Memoria máxima permitida
+      volumes:
+        - name: mariadb-persistent-storage
+          persistentVolumeClaim:
+            claimName: mariadb-pvc

@@ -1,0 +1,90 @@
+services:
+  control_unit:
+    build: ./ControlUnit
+    container_name: control_unit
+    ports:
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=5000
+      - THINGSBOARD_HOST=34.68.208.69
+      - THINGSBOARD_PORT_MQTT=1883
+      - THINGSBOARD_PORT=8080
+      - ACCESS_TOKEN=hhJXKGkWxl8jn2hf00Gb
+      - PRIVATE_KEY_PASSWORD=${PRIVATE_KEY_PASSWORD}
+      - TACOGRAPH_NAME=Tacografo_sesion05
+      - TENANT_USERNAME=tenant@thingsboard.org
+      - TENANT_PASSWORD=${TENANT_PASSWORD}
+      - CUSTOMER_ID=bda37140-0280-11f0-a7e2-81392f6ccc72
+    volumes:
+      - ./ControlUnit/code:/etc/usr/src/code
+
+  card_reader:
+    build: ./CardReader
+    container_name: card_reader
+    ports:
+      - "5001:5001"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - UC_SIMULATOR_HOST=control_unit
+      - UC_SIMULATOR_PORT=5000
+    volumes:
+      - ./CardReader/code:/etc/usr/src/code
+    depends_on:
+      - control_unit
+
+  positioning_system:
+    build: ./PositioningSystem
+    container_name: positioning_system
+    ports:
+      - "5002:5002"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=5002
+      - UC_SIMULATOR_HOST=control_unit
+      - UC_SIMULATOR_PORT=5000
+    volumes:
+      - ./PositioningSystem/code:/etc/usr/src/code
+    depends_on:
+      - control_unit
+
+  odometer_simulator:
+    build: Odometer
+    container_name: odometer_simulator
+    depends_on:
+      - control_unit
+    ports:
+      - "5003:5003"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=5003
+      - UC_SIMULATOR_HOST=control_unit
+      - UC_SIMULATOR_PORT=5000
+    volumes:
+      - ./Odometer/code:/etc/usr/src/code
+
+  routes_generator:
+    build: ./RoutesGenerator
+    container_name: routes_generator
+    ports:
+      - "5004:5004"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=5004
+      - GPS_SIMULATOR_HOST=positioning_system
+      - GPS_SIMULATOR_PORT=5002
+      - ODOMETER_SIMULATOR_HOST=odometer_simulator
+      - ODOMETER_SIMULATOR_PORT=5003
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+    depends_on:
+      - odometer_simulator
+      - positioning_system
+    volumes:
+      - ./RoutesGenerator/code:/etc/usr/src/code
+
+
+
+  
+
+    
+  

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gnss-configmap
+data:
+  HOST: "127.0.0.1"
+  PORT: "5002"

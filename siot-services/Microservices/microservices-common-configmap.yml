@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microservices-common-configmap
+data:
+  PYTHONUNBUFFERED: "1"
+
+  # Conexion con base de datos
+  DBHOST: "mariadb-service"
+  DBUSER: "fic_db_user"
+  DBDATABASE: "tachograph_data"

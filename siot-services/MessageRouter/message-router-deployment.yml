@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message-router
+spec:
+  replicas: 1  # Solo un pod del message-router
+  selector:
+    matchLabels:
+      app: message-router
+  template:
+    metadata:
+      labels:
+        app: message-router
+    spec:
+      containers:
+        - name: message-router
+          image: us-central1-docker.pkg.dev/uc3m-inf-2025-18654-g12/siot-repo/seluc3m-siot-message-router:c1
+          ports:
+            - containerPort: 6000
+          envFrom:
+            - configMapRef:
+                name: message-router-configmap
+          env:
+            - name: TENANT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: message-router-secrets
+                  key: TENANT_PASSWORD
+            - name: CUSTOMER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: message-router-secrets
+                  key: CUSTOMER_ID
+            - name: PRIVATE_KEY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: message-router-secrets
+                  key: PRIVATE_KEY_PASSWORD
