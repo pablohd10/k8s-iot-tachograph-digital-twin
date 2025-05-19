@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapp-backend-configmap
+data:
+  PYTHONUNBUFFERED: "1"
+
+  HOST: "0.0.0.0"
+  PORT: "5001"
+  
+  # Microservicios
+  EVENTS_MICROSERVICE_ADDRESS: 'events-microservice-service' 
+  EVENTS_MICROSERVICE_PORT: "6001"
+  TELEMETRY_MICROSERVICE_ADDRESS: 'telemetry-microservice-service' 
+  TELEMETRY_MICROSERVICE_PORT: "6002"

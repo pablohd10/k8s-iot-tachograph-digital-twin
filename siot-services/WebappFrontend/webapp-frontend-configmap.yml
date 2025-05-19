@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapp-frontend-configmap
+data:
+  PYTHONUNBUFFERED: "1"
+
+  HOST: "0.0.0.0"
+  PORT: "80"
+
+  BACKEND_ADDRESS: ""
+  

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-backend
+spec:
+  replicas: 1  # Solo un pod del microservicio
+  selector:
+    matchLabels:
+      app: webapp-backend
+  template:
+    metadata:
+      labels:
+        app: webapp-backend
+    spec:
+      containers:
+        - name: webapp-backend
+          image: seluc3m-siot-webapp-backend:c1 # us-central1-docker.pkg.dev/uc3m-inf-2025-18654-g12/siot-repo/seluc3m-siot-webapp-backend:c1
+          ports:
+            - containerPort: 5001
+          envFrom:
+            - configMapRef:
+                name: webapp-backend-configmap

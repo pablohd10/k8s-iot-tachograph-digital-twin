@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: events-microservice-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: events-microservice
   ports:

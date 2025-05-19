@@ -38,7 +38,10 @@ echo -e "\n👉 Lanzando Telemetry Microservice..."
 ./Microservices/TelemetryMicroservice/launch_telemetry_microservice_local.sh
 
 echo -e "\n👉 Lanzando Message Router..."
-./MessageRouter/launch_message_router_local.sh
+# ./MessageRouter/launch_message_router_local.sh
+
+echo -e "\n👉 Lanzando Webapp Backend..."
+./WebappBackend/launch_webapp_backend_local.sh
 
 echo -e "\n✅ Todos los componentes han sido desplegados en Minikube correctamente.\n"
 kubectl get pods

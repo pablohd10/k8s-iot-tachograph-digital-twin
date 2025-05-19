@@ -64,6 +64,10 @@ echo -e "\n👉 Lanzando Telemetry Microservice..."
 echo -e "\n👉 Lanzando Message Router..."
 ./MessageRouter/launch_message_router.sh
 
+echo -e "\n👉 Lanzando Webapp Backend..."
+./WebappBackend/launch_webapp_backend.sh
+
+
 echo -e "\n✅ Todos los componentes han sido desplegados correctamente."
 
 echo -e "\n🔍 Mostrando contextos de Kubernetes disponibles:"

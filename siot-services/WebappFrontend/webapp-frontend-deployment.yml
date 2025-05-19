@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-frontend
+spec:
+  replicas: 1  # Solo un pod del microservicio
+  selector:
+    matchLabels:
+      app: webapp-frontend
+  template:
+    metadata:
+      labels:
+        app: webapp-frontend
+    spec:
+      containers:
+        - name: webapp-frontend
+          image: us-central1-docker.pkg.dev/uc3m-inf-2025-18654-g12/siot-repo/seluc3m-siot-webapp-frontend:c1
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: webapp-frontend-configmap
+          env:
+            - name: GOOGLE_MAPS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: webapp-frontend-secrets
+                  key: GOOGLE_MAPS_API_KEY
+            - name: GOOGLE_MAP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: webapp-frontend-secrets
+                  key: GOOGLE_MAP_ID

@@ -3,10 +3,9 @@ kind: Service
 metadata:
   name: events-microservice-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: events-microservice
   ports:
     - port: 6001         # Puerto del servicio dentro del clúster
       targetPort: 6001   # Puerto del contenedor
-      nodePort: 30001    # Puerto accesible desde tu máquina local (rango permitido: 30000–32767)

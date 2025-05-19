@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: telemetry-microservice-service
 spec:
-  type: LoadBalancer # NodePort en local
+  type: ClusterIP
   selector:
     app: telemetry-microservice
   ports:
