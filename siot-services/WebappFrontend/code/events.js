@@ -3,6 +3,11 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const tachograph = urlParams.get("tachograph");
 
+// Cambiar el título visible en la interfaz
+document.getElementById("page_title").innerText = `Eventos del Tacógrafo ${tachograph}`;
+// Cambiar también el título de la pestaña
+document.title = `Eventos del Tacógrafo ${tachograph}`;
+
 // Contenedor donde se insertará la tabla de eventos
 const container = document.getElementById("events_list");
 

@@ -3,6 +3,11 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const tachograph = urlParams.get('tachograph');
 
+// Cambiar el título visible en la interfaz
+document.getElementById("page_title").innerText = `Telemetría del Tacógrafo ${tachograph}`;
+// Cambiar también el título de la pestaña
+document.title = `Telemetría del Tacógrafo ${tachograph}`;
+
 // Construye la URL del endpoint de la API con el ID como parámetro
 const url_api = `/tachographs/telemetry?tachograph_id=${tachograph}`;
 
