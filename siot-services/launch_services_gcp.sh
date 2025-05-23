@@ -51,7 +51,9 @@ chmod +x ./DBService/launch_mariadb.sh
 chmod +x ./Microservices/EventsMicroservice/launch_events_microservice.sh
 chmod +x ./Microservices/TelemetryMicroservice/launch_telemetry_microservice.sh
 chmod +x ./MessageRouter/launch_message_router.sh
+chmod +x ./WebappBackend/launch_webapp_backend.sh
 
+# Lanzar los servicios
 echo -e "\n👉 Lanzando base de datos MariaDB..."
 ./DBService/launch_mariadb.sh
 
@@ -67,6 +69,8 @@ echo -e "\n👉 Lanzando Message Router..."
 echo -e "\n👉 Lanzando Webapp Backend..."
 ./WebappBackend/launch_webapp_backend.sh
 
+echo -e "\n👉 Lanzando Webapp Frontend..."
+./WebappFrontend/launch_webapp_frontend.sh
 
 echo -e "\n✅ Todos los componentes han sido desplegados correctamente."
 

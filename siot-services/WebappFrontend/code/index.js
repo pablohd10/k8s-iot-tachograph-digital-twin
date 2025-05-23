@@ -1,5 +1,4 @@
 let map;
-const server_address = "http://${BACKEND_ADDRESS}:5001/";
 
 window.initMap = initMap;
 setInterval(initMap, 60000); // Refresh del mapa cada 60 segundos
@@ -13,15 +12,16 @@ async function initMap() {
   map = new Map(document.getElementById("map"), {
     center: position,
     zoom: 12,
-    mapId: "${GOOGLE_MAP_ID}",
+    mapId: "e827784f378bcb64bc7551a6",
   });
 
   const infoWindow = new google.maps.InfoWindow();
-  const url = server_address + "tachographs/active/";
+  const url_api = "/tachographs/active";
 
-  $.getJSON(url, function(result) {
+  $.getJSON(url_api, function(result) {
+    console.log(result)
     result.forEach(item => {
-      const m_position = { lat: item.Latitude, lng: item.Longitude };
+      const m_position = { lat: item.latitude, lng: item.longitude };
       const pinTextGlyph = new PinElement({
         glyph: "T",
         glyphColor: "white"
@@ -31,7 +31,7 @@ async function initMap() {
         map: map,
         position: m_position,
         content: pinTextGlyph.element,
-        title: item.Tachograph_id,
+        title: item.tachograph_id,
         gmpClickable: true
       });
 

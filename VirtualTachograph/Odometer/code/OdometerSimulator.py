@@ -118,7 +118,7 @@ def simulate_current_speed():
                                 simulated_speed = {
                                             "Type": "Odometer", 
                                             "Speed": random_speed, 
-                                            "Timestamp": datetime.datetime.timestamp(datetime.datetime.now())
+                                            "Timestamp": int(datetime.datetime.utcnow().timestamp() * 1000)
                                             }   
                                 try:
                                     print("[ Simular velocidades ] - sending speed: ", simulated_speed)

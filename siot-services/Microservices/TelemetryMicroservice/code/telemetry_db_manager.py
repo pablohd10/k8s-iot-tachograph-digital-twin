@@ -19,35 +19,6 @@ def connect_database():
     
 
 def register_telemetry_db(params):
-    """
-    Inserta una nueva entrada de telemetría en la base de datos.
-
-    Entrada:
-        - params: Diccionario con la información de telemetría. Debe incluir:
-            {
-                "Tachograph_id": str,
-                "Position": {
-                    "latitude": float,
-                    "longitude": float
-                },
-                "GPSSpeed": float,
-                "Speed": float,
-                "Driver": str,
-                "Timestamp": "YYYY-MM-DD HH:MM:SS"
-            }
-
-    Proceso:
-        - Convierte la fecha a timestamp UNIX.
-        - Inserta los datos en la tabla `telemetry`.
-        - Realiza rollback si hay errores durante la inserción.
-
-    Salida:
-        - True si la inserción fue exitosa.
-        - False si ocurrió un error.
-
-    Nota:
-        Utiliza la función connect_database() para acceder a la base de datos.
-    """
     connection = None
     cursor = None
 
@@ -61,9 +32,10 @@ def register_telemetry_db(params):
         driver = params["Driver"]
         timestamp_str = params["Timestamp"]
 
-        # Convertir fecha a timestamp UNIX (float)
-        dt_obj = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
-        timestamp = dt_obj.timestamp()
+        # Convertir string a datetime (con o sin microsegundos)
+        dt_obj = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f" if '.' in timestamp_str else "%Y-%m-%d %H:%M:%S")
+
+        print(f"[INFO] Registrando telemetría para {tachograph_id} en fecha: {dt_obj}")
 
         # Conexión a la base de datos
         connection = connect_database()
@@ -87,18 +59,17 @@ def register_telemetry_db(params):
             gps_speed,
             speed,
             driver,
-            timestamp
+            dt_obj  # ya es objeto datetime, no timestamp float
         )
 
         cursor.execute(insert_query, values)
-        connection.commit()  # Confirmar la transacción
-
+        connection.commit()
         return True
 
     except Error as e:
         print(f"[ERROR] Database error: {e}")
         if connection and connection.is_connected():
-            connection.rollback()  # Revertir si hubo cambios
+            connection.rollback()
         return False
 
     except Exception as e:
@@ -112,35 +83,14 @@ def register_telemetry_db(params):
             cursor.close()
         if connection and connection.is_connected():
             connection.close()
-
-
+        
 def get_telemetry_db(tachograph_id, init_interval, end_interval):
-    """
-    Recupera registros de telemetría de un tacógrafo en un intervalo de tiempo determinado.
-
-    Entrada:
-        - tachograph_id: Identificador del tacógrafo.
-        - init_interval: Fecha de inicio (str) con formato "YYYY-MM-DD HH:MM:SS".
-        - end_interval: Fecha de fin (str) con formato "YYYY-MM-DD HH:MM:SS".
-
-    Proceso:
-        - Convierte las fechas a timestamps UNIX.
-        - Consulta la tabla `telemetry` por registros que coincidan con el tacógrafo
-          y estén dentro del rango de tiempo.
-
-    Salida:
-        - Lista de diccionarios con los datos de telemetría ordenados por fecha.
-        - Lista vacía si no hay resultados o ocurre un error.
-
-    Nota:
-        Usa conexión a la base de datos a través de connect_database().
-    """
     connection = None
     cursor = None
     try:
-        # Convertir fechas a timestamp float
-        init_ts = datetime.strptime(init_interval, "%Y-%m-%d %H:%M:%S").timestamp()
-        end_ts = datetime.strptime(end_interval, "%Y-%m-%d %H:%M:%S").timestamp()
+        # Parsear strings a datetime
+        init_dt = datetime.strptime(init_interval, "%Y-%m-%d %H:%M:%S")
+        end_dt = datetime.strptime(end_interval, "%Y-%m-%d %H:%M:%S")
 
         # Conexión a la base de datos
         connection = connect_database()
@@ -156,17 +106,19 @@ def get_telemetry_db(tachograph_id, init_interval, end_interval):
             gps_speed,
             current_speed,
             current_driver_id,
-            FROM_UNIXTIME(time_stamp) AS time_stamp
+            time_stamp
         FROM telemetry
         WHERE tachograph_id = %s
           AND time_stamp BETWEEN %s AND %s
         ORDER BY time_stamp ASC
         """
 
-        cursor.execute(query, (tachograph_id, init_ts, end_ts))
+        print(f"Ejecutando consulta SQL para {tachograph_id} entre {init_dt} y {end_dt}")
+        cursor.execute(query, (tachograph_id, init_dt, end_dt))
         results = cursor.fetchall()
+        print("Resultado de la consulta:", results)
 
-        return results  # lista de diccionarios
+        return results
 
     except Error as e:
         print(f"[ERROR] Database error: {e}")

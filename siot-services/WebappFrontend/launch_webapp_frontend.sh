@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Variables de entorno
+export PROJECT_ID="uc3m-inf-2025-18654-g12" # nombre del proyecto
+
 # Conectarse al cluster
 echo "Conectándose al cluster Kubernetes services-cluster..."
 gcloud container clusters get-credentials services-cluster --region=us-central1
@@ -10,11 +13,8 @@ pushd WebappFrontend > /dev/null
 gcloud builds submit --region=us-central1 --tag us-central1-docker.pkg.dev/$PROJECT_ID/siot-repo/seluc3m-siot-webapp-frontend:c1
 popd > /dev/null
 
-echo -e "\n📦 Aplicando ConfigMaps Webapp Frontend...\n"
-kubectl apply -f WebappFrontend/webapp-frontend-configmap.yml
-
 echo -e "\n🌐 Aplicando servicio Webapp Frontend...\n"
 kubectl apply -f WebappFrontend/webapp-frontend-service.yml
 
 echo -e "\n📤 Desplegando deployment Webapp Frontend...\n"
-kubectl apply -f WebappFronten/webapp-frontend-deployment.yml
+kubectl apply -f WebappFrontend/webapp-frontend-deployment.yml

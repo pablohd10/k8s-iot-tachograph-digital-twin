@@ -1,5 +1,8 @@
-# Utiliza la imagen oficial de Apache HTTP Server como base
-FROM httpd:2.4
+# Usamos NGINX como base
+FROM nginx:alpine
 
-# Copia los archivos del frontend al directorio raíz del servidor web de Apache
-COPY ./code/ /usr/local/apache2/htdocs/
+# Copiamos los archivos HTML, CSS, JS a la ubicación estática
+COPY ./code/ /usr/share/nginx/html
+
+# Copiamos la configuración personalizada de NGINX
+COPY nginx.conf /etc/nginx/conf.d/default.conf

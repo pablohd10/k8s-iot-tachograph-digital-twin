@@ -17,15 +17,6 @@ def connect_database():
         return None
 
 def register_event_db(data):
-    """
-    Inserta un nuevo evento en la base de datos.
-
-    Parámetros:
-        data (dict): Diccionario con la información del evento.
-
-    Devuelve:
-        str: Cadena vacía si tuvo éxito, o mensaje de error si falló.
-    """
     try:
         tachograph_id = data["Tachograph_id"]
         latitude = data["Position"]["latitude"]
@@ -33,9 +24,10 @@ def register_event_db(data):
         warning = data["Warning"]
         timestamp_str = data["Timestamp"]
 
-        # Convertir fecha a timestamp UNIX (float)
-        dt_obj = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
-        timestamp = dt_obj.timestamp()
+        # Parsear string a datetime con microsegundos si es necesario
+        dt_obj = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f" if '.' in timestamp_str else "%Y-%m-%d %H:%M:%S")
+
+        print(f"[INFO] Registrando evento para {tachograph_id} en fecha: {dt_obj}")
 
         conn = connect_database()
         if conn is None:
@@ -47,7 +39,7 @@ def register_event_db(data):
             INSERT INTO events (tachograph_id, latitude, longitude, warning, time_stamp)
             VALUES (%s, %s, %s, %s, %s)
         """
-        values = (tachograph_id, latitude, longitude, warning, timestamp)
+        values = (tachograph_id, latitude, longitude, warning, dt_obj)
         cursor.execute(insert_query, values)
         conn.commit()
 
@@ -60,35 +52,18 @@ def register_event_db(data):
     except Exception as e:
         return f"General Error: {str(e)}"
 
+
 def get_events_db(tachograph_id, init_interval, end_interval):
-    """
-    Recupera registros de eventos de un tacógrafo en un intervalo de tiempo determinado.
-
-    Entrada:
-        - tachograph_id: Identificador del tacógrafo.
-        - init_interval: Fecha de inicio (str) con formato "YYYY-MM-DD HH:MM:SS".
-        - end_interval: Fecha de fin (str) con formato "YYYY-MM-DD HH:MM:SS".
-
-    Proceso:
-        - Convierte las fechas a timestamps UNIX.
-        - Consulta la tabla `telemetry` por registros que coincidan con el tacógrafo
-          y estén dentro del rango de tiempo.
-
-    Salida:
-        - Lista de diccionarios con los datos de telemetría ordenados por fecha.
-        - Lista vacía si no hay resultados o ocurre un error.
-
-    Nota:
-        Usa conexión a la base de datos a través de connect_database().
-    """
     connection = None
     cursor = None
     try:
-        # Convertir fechas a timestamp float
-        init_ts = datetime.strptime(init_interval, "%Y-%m-%d %H:%M:%S").timestamp()
-        end_ts = datetime.strptime(end_interval, "%Y-%m-%d %H:%M:%S").timestamp()
+        # Parsear fechas a objetos datetime
+        init_dt = datetime.strptime(init_interval, "%Y-%m-%d %H:%M:%S")
+        end_dt = datetime.strptime(end_interval, "%Y-%m-%d %H:%M:%S")
 
-        # Conexión a la base de datos
+        print(f"[INFO] Consultando eventos para el tacógrafo {tachograph_id}")
+        print(f"[INFO] Rango de fechas: {init_dt} → {end_dt}")
+
         connection = connect_database()
         if connection is None:
             return False
@@ -100,26 +75,22 @@ def get_events_db(tachograph_id, init_interval, end_interval):
             latitude,
             longitude,
             warning,
-            FROM_UNIXTIME(time_stamp) AS time_stamp
+            time_stamp
         FROM events
         WHERE tachograph_id = %s
           AND time_stamp BETWEEN %s AND %s
         ORDER BY time_stamp ASC
         """
-
-        cursor.execute(query, (tachograph_id, init_ts, end_ts))
+        cursor.execute(query, (tachograph_id, init_dt, end_dt))
         results = cursor.fetchall()
-
-        return results  # lista de diccionarios
+        return results
 
     except Error as e:
         print(f"[ERROR] Database error: {e}")
         return []
-
     except Exception as e:
         print(f"[ERROR] Unexpected error: {e}")
         return []
-
     finally:
         if cursor:
             cursor.close()

@@ -69,9 +69,9 @@ def generate_overspeed_warning():
     warning = {
         "Position": current_state["Position"],
         "Warning": f"OVERSPEED: Speed: {current_state['Speed']} - Driver: {current_state['Driver']}",
-        "Timestamp": datetime.timestamp(datetime.now())
+        "Timestamp": int(datetime.utcnow().timestamp() * 1000)
     }
-    print(f"\n[ WARNING ] - {warning['Warning']} - Timestamp: {warning['Timestamp']} - Position: ({warning['Position']}")
+    print(f"\n[ WARNING ] - {warning['Warning']} - Timestamp: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} - Position: ({warning['Position']}")
     with lock_event_logs:
         event_logs.append(warning)
 
@@ -79,9 +79,9 @@ def generate_movement_without_driver_warning():
     warning = {
         "Position": current_state["Position"],
         "Warning": f"MOVEMENT WITHOUT DRIVER: Speed: {current_state['Speed']}",
-        "Timestamp": datetime.timestamp(datetime.now())
+        "Timestamp": int(datetime.utcnow().timestamp() * 1000)
     }
-    print(f"\n[ WARNING ] - {warning['Warning']} - Timestamp: {warning['Timestamp']} - Position: ({warning['Position']})")
+    print(f"\n[ WARNING ] - {warning['Warning']} - Timestamp: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} - Position: ({warning['Position']})")
     with lock_event_logs:
         event_logs.append(warning)
 
@@ -89,9 +89,9 @@ def generate_speed_incoherence_warning():
     warning = {
         "Position": current_state["Position"],
         "Warning": f"SPEED INCOHERENCE: Speed: {current_state['Speed']} - GPSSpeed: {current_state['GPSSpeed']} - Driver: {current_state['Driver']}",
-        "Timestamp": datetime.timestamp(datetime.now())
+        "Timestamp": int(datetime.utcnow().timestamp() * 1000)
     }
-    print(f"\n[ WARNING ] - {warning['Warning']} - Timestamp: {warning['Timestamp']} - Position: ({warning['Position']})")
+    print(f"\n[ WARNING ] - {warning['Warning']} - Timestamp: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} - Position: ({warning['Position']})")
     with lock_event_logs:
         event_logs.append(warning)
 
@@ -99,9 +99,9 @@ def generate_disconnected_driver_event():
     warning = {
         "Position": current_state["Position"],
         "Warning": "DISCONNECTED DRIVER",
-        "Timestamp": datetime.timestamp(datetime.now())
+        "Timestamp": int(datetime.utcnow().timestamp() * 1000)
     }
-    print(f"\n[ WARNING ] - {warning['Warning']} - Timestamp: {warning['Timestamp']} - Position: ({warning['Position']})")
+    print(f"\n[ WARNING ] - {warning['Warning']} - Timestamp: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} - Position: ({warning['Position']})")
     with lock_event_logs:
         event_logs.append(warning)
 
@@ -109,9 +109,9 @@ def generate_connected_driver_event():
     warning = {
         "Position": current_state["Position"],
         "Warning": f"CONNECTED DRIVER: Driver: {current_state['Driver']}",
-        "Timestamp": datetime.timestamp(datetime.now())
+        "Timestamp": int(datetime.utcnow().timestamp() * 1000)
     }
-    print(f"\n[ WARNING ] - {warning['Warning']} - Timestamp: {warning['Timestamp']} - Position: ({warning['Position']})")
+    print(f"\n[ WARNING ] - {warning['Warning']} - Timestamp: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} - Position: ({warning['Position']})")
     with lock_event_logs:
         event_logs.append(warning)
 
@@ -290,7 +290,7 @@ def data_logger():
                 if current_state["Speed"] - current_state["GPSSpeed"] > SPEED_DIFFERENCE:
                     generate_speed_incoherence_warning()
 
-                last_time = datetime.timestamp(datetime.now()) * 1000 # Tiempo en milisegundos
+                last_time = int(datetime.utcnow().timestamp() * 1000) # Tiempo en milisegundos
         sleep(GENERATE_WARNINGS_EVERY)
 
 def process_received_message(data):
@@ -352,7 +352,7 @@ def client_listener(connection, address):
                 # Enviamos un mensaje de confirmación en formato JSON
                 confirmation_message = {
                     "Status": "ok",
-                    "Timestamp": datetime.timestamp(datetime.now()) * 1000,  # Timestamp en segundos
+                    "Timestamp": int(datetime.utcnow().timestamp() * 1000),  # Timestamp en milisegundos
                     "SamplingFrequency": SENSORS_SAMPLING_FREQUENCY
                 }
                 connection.sendall(bytes(json.dumps(confirmation_message), "utf-8"))
@@ -581,7 +581,7 @@ def send_telemetry_to_thingsboard():
                             device_private_key = load_private_key(password_private_key)
 
                             telemetry_with_ts = {
-                                "ts": datetime.timestamp(datetime.now()) * 1000,  # Timestamp en milisegundos
+                                "ts": int(datetime.utcnow().timestamp() * 1000),  # Timestamp en milisegundos
                                 "values": {
                                     "status": "OK",
                                     "message": "Telemetry sent correctly",
@@ -607,7 +607,7 @@ def send_telemetry_to_thingsboard():
                 print("Session not established yet. Sending initial telemetry...")
 
                 initial_telemetry = {
-                    "ts": datetime.timestamp(datetime.now()) * 1000, 
+                    "ts": int(datetime.utcnow().timestamp() * 1000), 
                     "values": {
                         "status": "Waiting for session configuration",
                         "message": "Device not yet configured"
@@ -647,7 +647,7 @@ def send_events_to_thingsboard():
                     signature = sign_message(device_private_key, event_str.encode())
 
                     event_with_ts = {
-                        "ts": datetime.timestamp(datetime.now()) * 1000, # Timestamp en milisegundos
+                        "ts": int(datetime.utcnow().timestamp() * 1000), # Timestamp en milisegundos
                         "values": {
                             "status_event": "OK",
                             "message_event": f"Event sent correctly",

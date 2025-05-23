@@ -32,7 +32,7 @@ def simulate_current_driver():
                             "Type": "CardReader",
                             "is_driver": is_driver,
                             "driver_present": driver_present,
-                            "Timestamp": datetime.datetime.timestamp(datetime.datetime.now()) * 1000
+                            "Timestamp": int(datetime.datetime.utcnow().timestamp() * 1000)
                         }
 
                         print("Sending simulated driver: ", simulated_driver)

@@ -1,11 +1,12 @@
+// Obtener el ID del tacógrafo desde los parámetros de la URL
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const tachograph = urlParams.get("tachograph");
 
-const body = { tachograph_id: tachograph };
+// Contenedor donde se insertará la tabla de eventos
 const container = document.getElementById("events_list");
 
-// Crear la tabla
+// Crear la estructura básica de la tabla con encabezados
 const table = document.createElement("table");
 const thead = document.createElement("thead");
 const headerRow = document.createElement("tr");
@@ -21,22 +22,27 @@ table.appendChild(thead);
 
 const tbody = document.createElement("tbody");
 
-// Endpoint del backend
-const address = "http://${BACKEND_ADDRESS}:5001/tachographs/events";
+// URL de la API con el parámetro del tacógrafo
+const url_api = `/tachographs/events?tachograph_id=${tachograph}`;
 
-// Petición a la API 
-$.getJSON(address, body, function (result) {
+// Obtener los eventos del tacógrafo y construir la tabla
+$.getJSON(url_api, function (result) {
+  console.log(result); // Para depuración
+
   result.forEach((item) => {
     const tr = document.createElement("tr");
 
+    // Celda: Fecha del evento
     const tdFecha = document.createElement("td");
     tdFecha.innerText = item.time_stamp || "-";
     tr.appendChild(tdFecha);
 
+    // Celda: Aviso o tipo de evento
     const tdWarning = document.createElement("td");
     tdWarning.innerText = item.warning || "-";
     tr.appendChild(tdWarning);
 
+    // Celda: Posición (latitud, longitud) con formato
     const tdPosition = document.createElement("td");
     tdPosition.innerText = `(${item.latitude.toFixed(5)}, ${item.longitude.toFixed(5)})`;
     tr.appendChild(tdPosition);

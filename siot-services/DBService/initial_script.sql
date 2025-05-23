@@ -17,7 +17,7 @@ CREATE TABLE events (
     latitude FLOAT,
     longitude FLOAT,
     warning VARCHAR(100) NOT NULL,
-    time_stamp FLOAT(8) NOT NULL,
+    time_stamp DATETIME(6) NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -25,11 +25,11 @@ CREATE TABLE events (
 CREATE TABLE telemetry (
     id MEDIUMINT NOT NULL AUTO_INCREMENT,
     tachograph_id VARCHAR(50) NOT NULL,
-    latitude FLOAT NOT NULL,
-    longitude FLOAT NOT NULL,
+    latitude FLOAT,
+    longitude FLOAT,
     gps_speed FLOAT NOT NULL,
     current_speed FLOAT NOT NULL,
     current_driver_id VARCHAR(50) NOT NULL,
-    time_stamp FLOAT(8) NOT NULL,
+    time_stamp DATETIME(6) NOT NULL,
     PRIMARY KEY (id)
 );

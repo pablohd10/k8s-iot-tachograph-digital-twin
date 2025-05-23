@@ -99,7 +99,7 @@ def simulate_positioning():
                                                     "Type": "GPS",
                                                     "Position": position["Origin"], 
                                                     "Speed": position["Speed"],
-                                                    "Timestamp": datetime.datetime.timestamp(datetime.datetime.now())
+                                                    "Timestamp": int(datetime.datetime.utcnow().timestamp() * 1000)
                                                     }
                                 print("[ Simular posiciones ] - Sending position: ", simulated_position)
                                 s.sendall(bytes(json.dumps(simulated_position), "utf-8"))
@@ -124,7 +124,7 @@ def simulate_positioning():
                                                 "Type": "GPS", 
                                                 "Position": last_position, 
                                                 "Speed": position["Speed"],
-                                                "Timestamp": datetime.datetime.timestamp(datetime.datetime.now())
+                                                "Timestamp": int(datetime.datetime.utcnow().timestamp() * 1000)
                                                 }
                             
                             print("[ Simular posiciones ] - Sending destination position: ", simulated_position)
@@ -151,7 +151,7 @@ def simulate_positioning():
                                                 "Type": "GPS", 
                                                 "Position": last_position, 
                                                 "Speed": 0.0,
-                                                "Timestamp": datetime.datetime.timestamp(datetime.datetime.now())
+                                                "Timestamp": int(datetime.datetime.utcnow().timestamp() * 1000)
                                                 }
                             s.sendall(bytes(json.dumps(simulated_position), "utf-8"))
                             print("\n[ Simular posiciones ] - Enviada posición final de la ruta. Speed = 0")

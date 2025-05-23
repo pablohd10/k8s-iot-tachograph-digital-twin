@@ -3,6 +3,7 @@ from flask_cors import CORS
 from telemetry_db_manager import *
 import requests
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -10,104 +11,100 @@ CORS(app)
 @app.route('/telemetry', methods=['POST'])
 def register_telemetry():
     """
-    This function registers a new telemetry in the tachograph database.
-    :parameter Tachograph_id:
-    :parameter Position:
-    :parameter GPSSpeed: 
-    :parameter Speed:
-    :parameter Driver:
-    :parameter time_stamp:
-    Example:
-    { "Tachograph_id":"1234BBC", 
-      "Position": {"Latitude":40.28908, "Longitude":-4.01197}, 
-      "GPSSpeed":0.0, 
-      "Speed":0.0, 
-      "Driver":"Driver 1", 
-      "Timestamp":"2023-11-27 17:48:52" 
-    } 
-    :return: A JSON object with the result of the operation.
+    Endpoint POST /telemetry
+
+    Recibe datos de telemetría enviados por el message router.
+    Formato de entrada esperado:
+    {
+        "Tachograph_id": "1234BBC",
+        "Position": {
+            "latitude": 40.28908,
+            "longitude": -4.01197
+        },
+        "GPSSpeed": 0.0,
+        "Speed": 0.0,
+        "Driver": "Driver 1",
+        "Timestamp": "2023-11-27 17:48:52"
+    }
     """
     try:
-        params = request.get_json()
+        data = request.get_json()
 
-        # Verificar que params sea un diccionario
-        if not isinstance(params, dict):
-            return {"result": "Invalid input format, expected JSON object"}, 400
+        # Validación de campos obligatorios
+        required_keys = ["Tachograph_id", "Position", "GPSSpeed", "Speed", "Driver", "Timestamp"]
+        for key in required_keys:
+            if key not in data:
+                return {"result": f"Missing field: {key}"}, 400
 
-        # Validar campos obligatorios
-        required_fields = ["Tachograph_id", "Position", "GPSSpeed", "Speed", "Driver", "Timestamp"]
-        for field in required_fields:
-            if field not in params:
-                return {"result": f"Missing required field: {field}"}, 400
-
-        # Validar el campo position
-        if not isinstance(params["Position"], dict):
-            return {"result": "Invalid Position format"}, 400
-        if "latitude" not in params["Position"] or "longitude" not in params["Position"]:
+        # Validación de posición
+        if data["Position"] == "None":
+            data["Position"] = {"latitude": None, "longitude": None}
+        if "latitude" not in data["Position"] or "longitude" not in data["Position"]:
             return {"result": "Missing latitude or longitude in position"}, 400
 
-        # Procesar la telemetría (guardarlo en la base de datos)
-        if register_telemetry_db(params):
-            print("Telemetry registered")
+        # Validación de tipos
+        if not isinstance(data["Tachograph_id"], str):
+            return {"result": "Tachograph_id must be a string"}, 400
+        if not isinstance(data["Driver"], str):
+            return {"result": "Driver must be a string"}, 400
+        if not isinstance(data["GPSSpeed"], (int, float)):
+            return {"result": "GPSSpeed must be a number"}, 400
+        if not isinstance(data["Speed"], (int, float)):
+            return {"result": "Speed must be a number"}, 400
+        if data["Position"]["latitude"] is not None and not isinstance(data["Position"]["latitude"], (int, float)):
+            return {"result": "latitude must be a number or null"}, 400
+        if data["Position"]["longitude"] is not None and not isinstance(data["Position"]["longitude"], (int, float)):
+            return {"result": "longitude must be a number or null"}, 400
+
+        try:
+            # Intenta con microsegundos, si no, sin ellos
+            try:
+                datetime.strptime(data["Timestamp"], "%Y-%m-%d %H:%M:%S.%f")
+            except ValueError:
+                datetime.strptime(data["Timestamp"], "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            return {"result": "Timestamp must be in format 'YYYY-MM-DD HH:MM:SS[.ffffff]'"}, 400
+
+        print("Timestamp: ", data["Timestamp"])
+
+        if register_telemetry_db(data):
             return {"result": "Telemetry registered"}, 201
         else:
             return {"result": "Error registering telemetry"}, 500
 
     except Exception as e:
-        # Captura errores inesperados y devuelve error 500
         return {"result": f"Exception occurred: {str(e)}"}, 500
-    
+
 
 @app.route('/telemetry', methods=['GET'])
 def get_telemetry():
     """
-    Endpoint GET /telemetry
+    GET /telemetry
 
-    Este método recibe como parámetros de entrada un objeto JSON con la información
-    del tacógrafo y el intervalo temporal a consultar. Devuelve una lista de telemetrías
-    registradas para el tacógrafo indicado dentro del intervalo especificado.
+    Input JSON format:
+    {
+        "Tachograph_id": "<Tachograph_id>",
+        "init_interval": "YYYY-MM-DD HH:MM:SS",
+        "end_interval": "YYYY-MM-DD HH:MM:SS"
+    }
 
-    Entrada (en el body de la petición GET como JSON):
-        {
-            "Tachograph_id": "<Tachograph_id>",
-            "init_interval": "YYYY-MM-DD HH:MM:SS",
-            "end_interval": "YYYY-MM-DD HH:MM:SS"
-        }
+    Dates are converted to UNIX timestamps in milliseconds internally.
 
-    Validaciones:
-        - El JSON debe tener los campos 'Tachograph_id', 'init_interval' y 'end_interval'.
-        - Las fechas deben tener el formato "YYYY-MM-DD HH:MM:SS".
-        - init_interval debe ser anterior a end_interval.
-
-    Salida:
-        - En caso de éxito (200): 
-            {
-                "telemetries": [ ... ]  # Lista con las telemetrías encontradas
-            }
-        - En caso de error (400/500): 
-            {
-                "result": "<mensaje de error>"
-            }
-
-    Nota:
-        El acceso a los datos se realiza a través del método get_telemetry_db()
-        definido en el módulo telemetry_db_manager.py.
+    Returns:
+        - 200 with telemetry list
+        - 400/500 with error message
     """
     try:
-        # Obtener los parámetros desde un JSON en el body de la petición GET
         params = request.get_json()
-
-        # Verificar que params sea un diccionario válido
         if not isinstance(params, dict):
             return {"result": "Invalid input format, expected JSON object"}, 400
         
-        # Validar campos requeridos
         required_fields = ["Tachograph_id", "init_interval", "end_interval"]
         for field in required_fields:
             if field not in params:
                 return {"result": f"Missing required field: {field}"}, 400
-            
-        # Extraer valores
+
+        # Extraer valores
         tachograph_id = params["Tachograph_id"]
         init_interval = params["init_interval"]
         end_interval = params["end_interval"]
@@ -122,15 +119,15 @@ def get_telemetry():
         # Validar que el intervalo tenga sentido
         if init_dt > end_dt:
             return {"result": "init_interval must be earlier than end_interval"}, 400
-        
-        results = get_telemetry_db(tachograph_id, init_interval, end_interval)
 
-        return {"telemetries": results}, 200
-    
+        results = get_telemetry_db(params["Tachograph_id"], init_interval, end_interval)
+        
+        return results, 200
+
     except Exception as e:
         return {"result": f"Exception occurred: {str(e)}"}, 500
 
-@app.route('/telemetry/positions/', methods=['GET'])
+@app.route('/telemetry/positions', methods=['GET'])
 def get_last_positions():
     """
     Endpoint GET /telemetry/positions/
@@ -159,7 +156,7 @@ def get_last_positions():
     """
     try:
         error_message, result = get_vehicles_last_position()
-
+        print("Result:", result)
         if error_message == "":
             return jsonify(result), 201
         else:

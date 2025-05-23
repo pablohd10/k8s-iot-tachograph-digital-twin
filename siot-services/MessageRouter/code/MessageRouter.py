@@ -207,7 +207,7 @@ def generate_session_config(device_id, device_public_key, message_router_private
     # Datos de sesión  
     session_data = {
         "session_id": os.urandom(16).hex(),
-        "timestamp": datetime.datetime.timestamp(datetime.datetime.now()) * 1000
+        "timestamp": int(datetime.datetime.utcnow().timestamp() * 1000)
     }
 
     # Convertimos a formato pem la clave pública del message_router
@@ -280,12 +280,12 @@ def receive_telemetry():
                     # Determinar el rango de tiempo a consultar: desde la última actividad hasta ahora
                     if not attrs:
                         # Si no hay atributo registrado, usar valor anterior o asumir una ventana de 1 minuto
-                        current_timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000)
+                        current_timestamp = int(datetime.datetime.utcnow().timestamp() * 1000)
                         last_timestamp = last_query_timestamps.get(device_id, current_timestamp - 60000)
                     else:
                         last_activity_ts = int(attrs[0]["value"])
                         last_timestamp = last_activity_ts
-                        current_timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000)
+                        current_timestamp = int(datetime.datetime.utcnow().timestamp() * 1000)
 
                     print(f"[ Receive Telemetry ] Rango: {last_timestamp} - {current_timestamp}")
 
@@ -332,10 +332,9 @@ def receive_telemetry():
                         if verify_signature(device_public_key, signature_value, telemetry_str.encode()):
                              # Firma válida → descifrar contenido
                             decrypted_data = decipher_log(json.loads(telemetry_str), session_key)
-                            readable_time = datetime.datetime.fromtimestamp(timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')
+                            readable_time = datetime.datetime.fromtimestamp(decrypted_data["Timestamp"] / 1000).strftime('%Y-%m-%d %H:%M:%S')
                             print(f"[ Receive Telemetry ] ✅ ({readable_time}) Telemetría válida de {device_name}: {decrypted_data}")
                             
-                            # Añadir timestamp legible antes de enviar
                             decrypted_data["Timestamp"] = readable_time
                             # Añadir id del tacografo antes de enviar
                             decrypted_data["Tachograph_id"] = device_name
@@ -343,7 +342,7 @@ def receive_telemetry():
                             # Enviar telemetría al microservicio de telemetría
                             try:
                                 response = register_telemetry(decrypted_data)
-                                print(f"[ Receive Telemetry ] 🚀 Telemetría enviada al microservicio: {response}")
+                                print(f"[ Receive Telemetry ] 🚀 Telemetría enviada al microservicio - {decrypted_data["Timestamp"]}: {response}")
                             except Exception as e:
                                 print(f"[ Receive Telemetry ] ❌ Error al enviar al microservicio de telemetría: {e}")
                                                     
@@ -446,7 +445,7 @@ def receive_events():
                         # Verificar la firma antes de descifrar el contenido
                         if verify_signature(device_public_key, signature_value, event_str.encode()):
                             decrypted_event = decipher_log(json.loads(event_str), session_key)
-                            readable_time = datetime.datetime.fromtimestamp(timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')
+                            readable_time = datetime.datetime.fromtimestamp(decrypted_event["Timestamp"] / 1000).strftime('%Y-%m-%d %H:%M:%S')
                             print(f"[ Receive Events ] ✅ ({readable_time}) Evento válido de {device_name}: {decrypted_event}")
                             
                             decrypted_event["Timestamp"] = readable_time
@@ -454,7 +453,7 @@ def receive_events():
 
                             try:
                                 response = register_event(decrypted_event)
-                                print(f"[ Receive Events ] 🚀 Evento enviado al microservicio: {response}")
+                                print(f"[ Receive Events ] 🚀 Evento enviado al microservicio - {decrypted_event["Timestamp"]}: {response}")
                             except Exception as e:
                                 print(f"[ Receive Events ] ❌ Error al enviar al microservicio de eventos: {e}")
                         else:

@@ -7,10 +7,10 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/events/', methods=['POST'])
+@app.route('/events', methods=['POST'])
 def register_event():
     """
-    Endpoint POST /event/
+    Endpoint POST /events
 
     Recibe datos de eventos enviados por el message router.
     Formato de entrada esperado:
@@ -48,11 +48,14 @@ def register_event():
         if data["Position"]["longitude"] is not None and not isinstance(data["Position"]["longitude"], (int, float)):
             return {"result": "longitude must be a number or null"}, 400
 
-        # Validación del timestamp
         try:
-            datetime.strptime(data["Timestamp"], "%Y-%m-%d %H:%M:%S")
+            # Intenta con microsegundos, si no, sin ellos
+            try:
+                datetime.strptime(data["Timestamp"], "%Y-%m-%d %H:%M:%S.%f")
+            except ValueError:
+                datetime.strptime(data["Timestamp"], "%Y-%m-%d %H:%M:%S")
         except ValueError:
-            return {"result": "Timestamp must be in format 'YYYY-MM-DD HH:MM:SS'"}, 400
+            return {"result": "Timestamp must be in format 'YYYY-MM-DD HH:MM:SS[.ffffff]'"}, 400
 
         error_message = register_event_db(data)
         
@@ -131,7 +134,7 @@ def get_events():
         
         results = get_events_db(tachograph_id, init_interval, end_interval)
 
-        return {"events": results}, 200
+        return results, 200
     
     except Exception as e:
         return {"result": f"Exception occurred: {str(e)}"}, 500
