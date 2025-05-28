@@ -65,6 +65,3 @@ Local deployment is intended to be run on Minikube using the provided scripts. *
 - Google Cloud SDK (for GKE)
 - Python (for most microservices)
 
-## License
-
-[Specify your license here]
