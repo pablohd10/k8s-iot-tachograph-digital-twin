@@ -91,10 +91,7 @@ The web application is built using the Backend for Frontend (BFF) pattern with N
 ### Setup
 
 1. Obtain a Google Maps API key from the Google Cloud Console
-2. Configure the API key in the environment variables:
-   ```sh
-   export GOOGLE_MAPS_API_KEY="your-api-key-here"
-   ```
+2. Configure the API key in the corresponding configmap
 3. Update the frontend configuration with the API key
 4. Restart the frontend service to apply changes
 
@@ -106,5 +103,5 @@ The web application follows the Backend for Frontend pattern:
   - Position tracking service
   - Telemetry data service
   - Event processing service
-- Real-time data updates through WebSocket connections
+- Data updates every 30 seconds for the positions and 1 minute for the telemetry and events data
 
