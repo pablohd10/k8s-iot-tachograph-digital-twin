@@ -65,3 +65,46 @@ Local deployment is intended to be run on Minikube using the provided scripts. *
 - Google Cloud SDK (for GKE)
 - Python (for most microservices)
 
+## Web Application Features
+
+The web application is built using the Backend for Frontend (BFF) pattern with Nginx as the API gateway, providing a seamless user experience for monitoring and analyzing tachograph data.
+
+### Main Functionalities
+
+1. **Real-time Tachograph Monitoring**
+   - Live tracking of all active tachographs on Google Maps
+   - Position updates every 30 seconds
+   - Interactive map interface for easy visualization
+
+2. **Detailed Tachograph Information**
+   - Click on any tachograph marker to view detailed information
+   - Real-time table display of the latest telemetry data
+   - Event history for the last minute
+   - Comprehensive data visualization
+
+### Technical Requirements
+
+- Google Maps API key (required for map functionality)
+- Modern web browser with JavaScript enabled
+- Stable internet connection for real-time updates
+
+### Setup
+
+1. Obtain a Google Maps API key from the Google Cloud Console
+2. Configure the API key in the environment variables:
+   ```sh
+   export GOOGLE_MAPS_API_KEY="your-api-key-here"
+   ```
+3. Update the frontend configuration with the API key
+4. Restart the frontend service to apply changes
+
+### Architecture
+
+The web application follows the Backend for Frontend pattern:
+- Nginx serves as the API gateway
+- Microservices handle specific functionalities:
+  - Position tracking service
+  - Telemetry data service
+  - Event processing service
+- Real-time data updates through WebSocket connections
+
