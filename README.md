@@ -76,11 +76,20 @@ The web application is built using the Backend for Frontend (BFF) pattern with N
    - Position updates every 30 seconds
    - Interactive map interface for easy visualization
 
+   #### Real-time Map
+   ![Real-time Vehicle Fleet Map](map.png)
+
 2. **Detailed Tachograph Information**
    - Click on any tachograph marker to view detailed information
    - Real-time table display of the latest telemetry data
    - Event history for the last minute
    - Comprehensive data visualization
+
+   #### Telemetry Data
+   ![Tachograph Telemetry](telemetry.png)
+
+   #### Event History
+   ![Tachograph Events](events.png)
 
 ### Technical Requirements
 
