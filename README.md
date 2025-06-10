@@ -27,10 +27,13 @@ This project simulates a scalable IoT digital tachograph system using Kubernetes
 
 - `siot-services/`
   Backend services, analytics, message routing, database, and ThingsBoard integration.
+
 - `VirtualTachograph/`
   Digital tachograph simulator and its subsystems (ControlUnit, CardReader, PositioningSystem, Odometer, RoutesGenerator).
+
 - `delete-all-pvc.sh`
   Script to clean up Persistent Volume Claims in Kubernetes.
+  
 - `README.md`
   Project documentation (this file).
 
@@ -97,8 +100,6 @@ The web application is built using the Backend for Frontend (BFF) pattern with N
 ### Technical Requirements
 
 - 🔑 Google Maps API key (required for map functionality)
-- 💻 Modern web browser with JavaScript enabled
-- 📡 Stable internet connection for real-time updates
 
 ### Setup
 
