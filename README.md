@@ -77,7 +77,7 @@ The web application is built using the Backend for Frontend (BFF) pattern with N
    - Interactive map interface for easy visualization
 
    #### Real-time Map
-   ![Real-time Vehicle Fleet Map](map.png)
+   ![Real-time Vehicle Fleet Map](./assets/map.png)
 
 2. **Detailed Tachograph Information**
    - Click on any tachograph marker to view detailed information
@@ -86,10 +86,10 @@ The web application is built using the Backend for Frontend (BFF) pattern with N
    - Comprehensive data visualization
 
    #### Telemetry Data
-   ![Tachograph Telemetry](telemetry.png)
+   ![Tachograph Telemetry](./assets/telemetry.png)
 
    #### Event History
-   ![Tachograph Events](events.png)
+   ![Tachograph Events](./assets/events.png)
 
 ### Technical Requirements
 
