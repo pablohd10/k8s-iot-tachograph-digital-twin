@@ -9,13 +9,16 @@ This project simulates a scalable IoT digital tachograph system using Kubernetes
 ### Main Components
 
 - ☸️ **Google Kubernetes Engine (GKE):** Orchestrates all services and simulators.
+  
 - ☁️ **siot-services-cluster:** Hosts core backend, analytics, and data management services.
   - 🖥️ **Analytic Frontend & Backend:** Web application for end users with dashboards and analytics.
   - ⚡ **Events Manager & Telemetry Manager:** Event processing and telemetry management.
   - 🗄️ **MariaDB:** Central database for storing telemetry and event data.
   - 📧 **Message Router:** Routes messages between services and ThingsBoard.
+  
 - 🚗 **siot-vehicles-cluster:** Simulates multiple digital tachographs (virtual vehicles).
   - 🛰️ **Tachograph Simulators:** Each instance simulates a vehicle's tachograph, including subsystems for control, card reading, positioning, odometer, and route generation.
+  
 - ⚙️ **ThingsBoard:** IoT platform for device management, data visualization, and integration.
 
 > **Note:** ThingsBoard must be deployed independently from the cluster. Once deployed, update its external IP address in the corresponding configmaps so that all services can communicate with it correctly.
