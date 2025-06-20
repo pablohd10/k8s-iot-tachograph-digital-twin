@@ -1,6 +1,6 @@
 # 📊 k8s-iot-tachograph-digital-twin
 
-This project simulates a scalable IoT digital tachograph system using Kubernetes and Docker, designed for deployment on Google Cloud Platform (GCP). It features a modular architecture for simulating vehicle tachographs, managing telemetry, and providing analytics through ThingsBoard and custom microservices.
+This project simulates a scalable IoT digital tachograph system using Kubernetes and Docker, designed for deployment on Google Cloud Platform (GCP). It features a modular architecture for simulating vehicle tachographs, managing telemetry and events, and providing analytics through ThingsBoard and custom microservices.
 
 ## 🏗️ Architecture
 
@@ -11,10 +11,10 @@ This project simulates a scalable IoT digital tachograph system using Kubernetes
 - ☸️ **Google Kubernetes Engine (GKE):** Orchestrates all services and simulators.
   
 - ☁️ **siot-services-cluster:** Hosts core backend, analytics, and data management services.
-  - 🖥️ **Analytic Frontend & Backend:** Web application for end users with dashboards and analytics.
+  - 🖥️ **Analytic Frontend & Backend:** Web application for end users with real time tachographs positions and telemetry and events data for each tachograph.
   - ⚡ **Events Manager & Telemetry Manager:** Event processing and telemetry management.
   - 🗄️ **MariaDB:** Central database for storing telemetry and event data.
-  - 📧 **Message Router:** Routes messages between services and ThingsBoard.
+  - 📧 **Message Router:** Obtain messages from ThingsBoard and manages decryption, signatures and session keys.
   
 - 🚗 **siot-vehicles-cluster:** Simulates multiple digital tachographs (virtual vehicles).
   - 🛰️ **Tachograph Simulators:** Each instance simulates a vehicle's tachograph, including subsystems for control, card reading, positioning, odometer, and route generation.
@@ -60,16 +60,16 @@ Local deployment is intended to be run on Minikube using the provided scripts. *
 
 ## 🖥️ Usage
 
-- Access the analytics frontend for dashboards and data visualization.
+- Access the frontend for real-time visualization of positioning data from tachographs.
 - Use ThingsBoard for device management and telemetry monitoring.
-- The simulated tachographs send data through the message router to the backend and ThingsBoard.
+- The simulated tachographs send data to Thingsboard and the message router obtains these data.
 
 ## ✅ Requirements
 
 - Docker & Docker Compose
 - Kubernetes (for cloud deployment)
 - Google Cloud SDK (for GKE)
-- Python (for most microservices)
+- Python (for microservices and tachograph simulators)
 
 ## 🌐 Web Application Features
 
